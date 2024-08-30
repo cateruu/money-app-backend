@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/cateruu/money-app-backend/internal/data"
 	"github.com/cateruu/money-app-backend/pkg/logger"
 )
 
@@ -38,17 +39,19 @@ func main() {
 
 	flag.Parse()
 
-	_, err := openDB(cfg)
+	db, err := openDB(cfg)
 	if err != nil {
 		logger.Log.Error(err.Error())
 		os.Exit(1)
 	}
 
+	models := data.NewModels(db)
+
 	app := app{
 		config: cfg,
 	}
 
-	err = app.serve()
+	err = app.serve(&models)
 	if err != nil {
 		logger.Log.Error(err.Error())
 		os.Exit(1)

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cateruu/money-app-backend/pkg/errors"
+	"github.com/cateruu/money-app-backend/pkg/httperror"
 )
 
 func RecoverPanic(next http.Handler) http.Handler {
@@ -13,7 +13,7 @@ func RecoverPanic(next http.Handler) http.Handler {
 			if err := recover(); err != nil {
 				w.Header().Set("Connection", "close")
 
-				errors.ServerErrorResponse(w, r, fmt.Errorf("%s", err))
+				httperror.ServerErrorResponse(w, r, fmt.Errorf("%s", err))
 			}
 		}()
 

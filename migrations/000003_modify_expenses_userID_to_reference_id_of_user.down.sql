@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS expenses
+DROP CONSTRAINT fk_user;
