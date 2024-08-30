@@ -9,13 +9,16 @@ import (
 )
 
 func (app *app) routes(models *data.Models) http.Handler {
-	handler := v1.NewHandler(models)
+	routes := v1.NewHandler(models)
+	handler := middleware.NewHandler(models)
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /v1/expenses", handler.CreateExpenseHandler)
-	router.HandleFunc("GET /v1/expenses/{id}", handler.GetExpenseHandler)
+	router.HandleFunc("POST /v1/expenses", routes.CreateExpenseHandler)
+	router.HandleFunc("GET /v1/expenses/{id}", routes.GetExpenseHandler)
 
-	router.HandleFunc("POST /v1/users", handler.RegisterUserHandler)
+	router.HandleFunc("POST /v1/users", routes.RegisterUserHandler)
 
-	return middleware.RecoverPanic(router)
+	router.HandleFunc("POST /v1/tokens/authentication", routes.GenerateTokenHandler)
+
+	return handler.RecoverPanic(handler.Authenticate(router))
 }

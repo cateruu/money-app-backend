@@ -45,3 +45,15 @@ func BadRequestResponse(w http.ResponseWriter, r *http.Request, err error) {
 func FailedValidationResponse(w http.ResponseWriter, r *http.Request, errors map[string]string) {
 	errorResponse(w, r, http.StatusUnprocessableEntity, errors)
 }
+
+func InvalidCredentialsResponse(w http.ResponseWriter, r *http.Request) {
+	message := "Invalid credentials provided"
+	errorResponse(w, r, http.StatusUnauthorized, message)
+}
+
+func InvalidAuthenticationTokenResponse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("WWW-Authenticate", "Bearer")
+
+	message := "invalid authentication token"
+	errorResponse(w, r, http.StatusUnauthorized, message)
+}

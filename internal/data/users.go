@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
 	"strings"
 	"time"
@@ -24,6 +25,12 @@ type User struct {
 	Email     string    `json:"email"`
 	Password  password  `json:"-"`
 	Version   int       `json:"-"`
+}
+
+var AnonymousUser = &User{}
+
+func (u *User) IsAnynonymous() bool {
+	return u == AnonymousUser
 }
 
 type password struct {
@@ -163,4 +170,38 @@ func (m UserModel) Update(user *User) error {
 	}
 
 	return nil
+}
+
+func (m UserModel) GetForToken(scope string, tokenPlaintext string) (*User, error) {
+	tokenHash := sha256.Sum256([]byte(tokenPlaintext))
+
+	query := `SELECT users.id, users.name, users.email, users.password_hash, users.created_at, users.version
+	FROM users
+	INNER JOIN tokens
+	ON users.id = tokens.user_id
+	WHERE tokens.scope = $1 AND tokens.hash = $2 AND tokens.expiry > $3`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var user User
+
+	err := m.DB.QueryRow(ctx, query, scope, tokenHash[:], time.Now()).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.Password.hash,
+		&user.CreatedAt,
+		&user.Version,
+	)
+	if err != nil {
+		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+
+	return &user, nil
 }
