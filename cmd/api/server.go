@@ -11,14 +11,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cateruu/money-app-backend/internal/data"
 	"github.com/cateruu/money-app-backend/pkg/logger"
 )
 
-func (app *app) serve(models *data.Models) error {
+func (app *app) serve() error {
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", app.config.port),
-		Handler:      app.routes(models),
+		Handler:      app.routes(),
 		IdleTimeout:  time.Minute,
 		WriteTimeout: 10 * time.Second,
 		ReadTimeout:  5 * time.Second,

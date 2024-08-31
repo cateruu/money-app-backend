@@ -79,3 +79,16 @@ func (h *Handler) Authenticate(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+func (h *Handler) ProtectedRoute(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user := httpcontext.GetUser(r)
+
+		if user.IsAnynonymous() {
+			httperror.FailedAuthroizationResponse(w, r)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}

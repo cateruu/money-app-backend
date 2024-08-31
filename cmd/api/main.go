@@ -24,6 +24,7 @@ type config struct {
 type app struct {
 	config config
 	wg     sync.WaitGroup
+	models *data.Models
 }
 
 func main() {
@@ -49,9 +50,10 @@ func main() {
 
 	app := app{
 		config: cfg,
+		models: &models,
 	}
 
-	err = app.serve(&models)
+	err = app.serve()
 	if err != nil {
 		logger.Log.Error(err.Error())
 		os.Exit(1)

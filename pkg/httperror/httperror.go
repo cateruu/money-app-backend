@@ -57,3 +57,10 @@ func InvalidAuthenticationTokenResponse(w http.ResponseWriter, r *http.Request) 
 	message := "invalid authentication token"
 	errorResponse(w, r, http.StatusUnauthorized, message)
 }
+
+func FailedAuthroizationResponse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("WWW-Authenticate", "Bearer")
+
+	message := "you do not have permission to access this resource"
+	errorResponse(w, r, http.StatusUnauthorized, message)
+}
