@@ -15,6 +15,8 @@ func (app *app) routes() http.Handler {
 
 	router.HandleFunc("POST /v1/expenses", handler.ProtectedRoute(routes.CreateExpenseHandler))
 	router.HandleFunc("GET /v1/expenses/{id}", handler.ProtectedRoute(routes.GetExpenseHandler))
+	router.HandleFunc("PATCH /v1/expenses/{id}", handler.ProtectedRoute(routes.UpdateExpenseHandler))
+	router.HandleFunc("DELETE /v1/expenses/{id}", handler.ProtectedRoute(routes.DeleteExpenseHandler))
 
 	router.HandleFunc("POST /v1/users", routes.RegisterUserHandler)
 
